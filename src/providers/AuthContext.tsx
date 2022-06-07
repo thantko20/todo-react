@@ -1,9 +1,9 @@
-import { createContext, ReactNode, Reducer, useReducer, useState } from 'react';
-import { User } from 'firebase/auth';
-import { auth } from '../firebase';
+import { createContext, ReactNode, Reducer, useReducer } from 'react';
+import { User, GoogleAuthProvider } from 'firebase/auth';
+import { auth, signInWithPopup, signOut as FbSignOut } from '../firebase';
 
 // User object
-type UserType = User | null;
+type UserType = User | null | undefined;
 
 // Need to store auth state
 // user, loading and error
@@ -11,7 +11,7 @@ type UserType = User | null;
 interface AuthState {
   user: UserType;
   loading: boolean;
-  error: Error | null;
+  error: any;
 }
 
 const initialAuth: AuthState = {
@@ -29,7 +29,7 @@ interface Action {
   type: ActionType;
   user?: UserType;
   loading?: boolean;
-  error?: Error | null;
+  error?: any;
 }
 
 // Reducer function for auth state
@@ -44,6 +44,27 @@ const authReducer: Reducer<AuthState, Action> = (
         loading: true,
       };
     }
+    case 'LOGIN_SUCCESSFUL': {
+      return {
+        user: action.user,
+        loading: false,
+        error: null,
+      };
+    }
+    case 'LOGIN_ERROR': {
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
+      };
+    }
+    case 'LOGOUT': {
+      return {
+        user: action.user,
+        loading: false,
+        error: null,
+      };
+    }
     default:
       return state;
   }
@@ -54,11 +75,41 @@ interface Props {
 }
 
 const AuthProvider = ({ children }: Props) => {
-  const [authState, dispatch] = useReducer(authReducer, initialAuth);
-
-  return (
-    <AuthContext.Provider value={initialAuth}>{children}</AuthContext.Provider>
+  const [{ user, loading, error }, dispatch] = useReducer(
+    authReducer,
+    initialAuth,
   );
+
+  const authProvider = new GoogleAuthProvider();
+
+  const signIn = async () => {
+    try {
+      dispatch({
+        type: 'START_LOGIN',
+      });
+      const result = await signInWithPopup(auth, authProvider);
+
+      dispatch({
+        type: 'LOGIN_SUCCESSFUL',
+        user: result.user,
+      });
+    } catch (error) {
+      console.log(error);
+      dispatch({
+        type: 'LOGIN_ERROR',
+        error,
+      });
+    }
+  };
+
+  const value = {
+    user,
+    loading,
+    error,
+    signIn,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export { AuthContext, AuthProvider };

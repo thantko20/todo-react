@@ -87,11 +87,11 @@ const AuthProvider = ({ children }: Props) => {
       dispatch({
         type: 'START_LOGIN',
       });
-      const result = await signInWithPopup(auth, authProvider);
+      await signInWithPopup(auth, authProvider);
 
       dispatch({
         type: 'LOGIN_SUCCESSFUL',
-        user: result.user,
+        user: auth.currentUser,
       });
     } catch (error) {
       console.log(error);
@@ -102,11 +102,20 @@ const AuthProvider = ({ children }: Props) => {
     }
   };
 
+  const signOut = async () => {
+    await FbSignOut(auth);
+    dispatch({
+      type: 'LOGOUT',
+      user: auth.currentUser,
+    });
+  };
+
   const value = {
     user,
     loading,
     error,
     signIn,
+    signOut,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

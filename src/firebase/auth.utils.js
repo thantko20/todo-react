@@ -8,9 +8,6 @@ const provider = new GoogleAuthProvider();
 const signIn = async () => {
   await signInWithPopup(auth, provider);
   const user = auth.currentUser;
-  console.log(user);
-
-  // TODO: Save user info in database
 
   const { displayName, email, uid } = user;
   const now = new Date();

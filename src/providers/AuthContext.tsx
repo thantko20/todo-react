@@ -1,12 +1,14 @@
-import { createContext, ReactNode, Reducer, useReducer } from 'react';
-import { User, GoogleAuthProvider } from 'firebase/auth';
-import { auth, signInWithPopup, signOut as FbSignOut } from '../firebase';
+import {
+  createContext,
+  ReactNode,
+  Reducer,
+  useContext,
+  useReducer,
+} from 'react';
+import { User } from 'firebase/auth';
+import { auth, signIn, signOut } from '../firebase';
 
-// User object
 type UserType = User | null | undefined;
-
-// Need to store auth state
-// user, loading and error
 
 interface AuthState {
   user: UserType;
@@ -15,12 +17,21 @@ interface AuthState {
 }
 
 const initialAuth: AuthState = {
-  user: null,
+  user: auth.currentUser,
   loading: false,
   error: null,
 };
 
-const AuthContext = createContext<AuthState>(initialAuth);
+type AuthContextType = {
+  user: UserType;
+  loading: boolean;
+  error: any;
+  handleSignIn: () => void;
+  handleSignOut: () => void;
+};
+
+const AuthContext = createContext<AuthContextType | null>(null);
+const useAuthContext = () => useContext(AuthContext) as AuthContextType;
 
 // Action type
 type ActionType = 'START_LOGIN' | 'LOGIN_SUCCESSFUL' | 'LOGIN_ERROR' | 'LOGOUT';
@@ -80,14 +91,13 @@ const AuthProvider = ({ children }: Props) => {
     initialAuth,
   );
 
-  const authProvider = new GoogleAuthProvider();
-
-  const signIn = async () => {
+  const handleSignIn = async () => {
     try {
       dispatch({
         type: 'START_LOGIN',
       });
-      await signInWithPopup(auth, authProvider);
+
+      await signIn();
 
       dispatch({
         type: 'LOGIN_SUCCESSFUL',
@@ -102,8 +112,9 @@ const AuthProvider = ({ children }: Props) => {
     }
   };
 
-  const signOut = async () => {
-    await FbSignOut(auth);
+  const handleSignOut = async () => {
+    await signOut();
+
     dispatch({
       type: 'LOGOUT',
       user: auth.currentUser,
@@ -114,11 +125,11 @@ const AuthProvider = ({ children }: Props) => {
     user,
     loading,
     error,
-    signIn,
-    signOut,
+    handleSignIn,
+    handleSignOut,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export { AuthContext, AuthProvider };
+export { AuthProvider, useAuthContext };

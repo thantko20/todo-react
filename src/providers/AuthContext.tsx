@@ -3,10 +3,11 @@ import {
   ReactNode,
   Reducer,
   useContext,
+  useEffect,
   useReducer,
 } from 'react';
-import { User } from 'firebase/auth';
-import { auth, signIn, signOut } from '../firebase';
+import { User, onAuthStateChanged, getAuth } from 'firebase/auth';
+import { signIn, signOut } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 
 type UserType = User | null | undefined;
@@ -18,7 +19,7 @@ interface AuthState {
 }
 
 const initialAuth: AuthState = {
-  user: auth.currentUser,
+  user: getAuth().currentUser,
   loading: false,
   error: null,
 };
@@ -35,7 +36,12 @@ const AuthContext = createContext<AuthContextType | null>(null);
 const useAuthContext = () => useContext(AuthContext) as AuthContextType;
 
 // Action type
-type ActionType = 'START_LOGIN' | 'LOGIN_SUCCESSFUL' | 'LOGIN_ERROR' | 'LOGOUT';
+type ActionType =
+  | 'START_LOGIN'
+  | 'LOGIN_SUCCESSFUL'
+  | 'LOGIN_ERROR'
+  | 'LOGOUT'
+  | 'SET_AUTH_STATE';
 
 interface Action {
   type: ActionType;
@@ -77,6 +83,12 @@ const authReducer: Reducer<AuthState, Action> = (
         error: null,
       };
     }
+    case 'SET_AUTH_STATE': {
+      return {
+        ...state,
+        user: action.user,
+      };
+    }
     default:
       return state;
   }
@@ -94,6 +106,23 @@ const AuthProvider = ({ children }: Props) => {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(getAuth(), (u) => {
+      dispatch({
+        type: 'SET_AUTH_STATE',
+        user: getAuth().currentUser,
+      });
+
+      if (u) {
+        navigate('/main');
+      } else {
+        navigate('/');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
+
   const handleSignIn = async () => {
     try {
       dispatch({
@@ -104,9 +133,8 @@ const AuthProvider = ({ children }: Props) => {
 
       dispatch({
         type: 'LOGIN_SUCCESSFUL',
-        user: auth.currentUser,
+        user: getAuth().currentUser,
       });
-      navigate('/main');
     } catch (error) {
       console.log(error);
       dispatch({
@@ -121,9 +149,8 @@ const AuthProvider = ({ children }: Props) => {
 
     dispatch({
       type: 'LOGOUT',
-      user: auth.currentUser,
+      user: getAuth().currentUser,
     });
-    navigate('/');
   };
 
   const value = {

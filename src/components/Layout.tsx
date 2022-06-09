@@ -1,11 +1,15 @@
 import { Outlet } from 'react-router-dom';
-import { Box } from '@chakra-ui/react';
+import { AuthProvider } from '../providers/AuthContext';
+import Header from './Header';
 
 const Layout = () => {
   return (
-    <Box>
-      <Outlet />
-    </Box>
+    <div className='bg-gray-100 min-h-screen'>
+      <AuthProvider>
+        <Header />
+        <Outlet />
+      </AuthProvider>
+    </div>
   );
 };
 

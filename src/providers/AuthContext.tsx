@@ -7,6 +7,7 @@ import {
 } from 'react';
 import { User } from 'firebase/auth';
 import { auth, signIn, signOut } from '../firebase';
+import { useNavigate } from 'react-router-dom';
 
 type UserType = User | null | undefined;
 
@@ -91,6 +92,8 @@ const AuthProvider = ({ children }: Props) => {
     initialAuth,
   );
 
+  const navigate = useNavigate();
+
   const handleSignIn = async () => {
     try {
       dispatch({
@@ -103,6 +106,7 @@ const AuthProvider = ({ children }: Props) => {
         type: 'LOGIN_SUCCESSFUL',
         user: auth.currentUser,
       });
+      navigate('/main');
     } catch (error) {
       console.log(error);
       dispatch({
@@ -119,6 +123,7 @@ const AuthProvider = ({ children }: Props) => {
       type: 'LOGOUT',
       user: auth.currentUser,
     });
+    navigate('/');
   };
 
   const value = {

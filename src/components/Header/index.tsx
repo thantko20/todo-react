@@ -1,18 +1,23 @@
 import { useAuthContext } from '../../providers/AuthContext';
+import Button from '../Button';
+import AccountAvatar from './AccountAvatar';
 
 const Header = () => {
   const { user, handleSignOut } = useAuthContext();
 
   return (
-    <header className='w-full bg-slate-900 text-gray-50 px-10 py-6 flex justify-between items-center'>
-      <h1 className='text-3xl font-bold'>Todo-List</h1>
+    <header className='w-full px-10 py-6 flex justify-between items-center bg-white'>
+      <h1 className='text-3xl font-bold text-indigo-900'>Todo-List</h1>
       {user && (
-        <button
-          onClick={handleSignOut}
-          className='px-4 py-2 bg-indigo-500 text-indigo-50 text-sm rounded font-bold hover:bg-indigo-600'
-        >
-          Logout
-        </button>
+        <div className='flex gap-6 items-center'>
+          <AccountAvatar
+            displayName={user.displayName}
+            photoURL={user.photoURL}
+          />
+          <Button onClick={handleSignOut} variant='secondary'>
+            Logout
+          </Button>
+        </div>
       )}
     </header>
   );

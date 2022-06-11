@@ -32,8 +32,6 @@ const getProjects = async (userId) => {
   const tempData = [];
   snapshot.forEach((item) => tempData.push(item.data()));
 
-  console.log(tempData);
-
   return tempData;
 };
 

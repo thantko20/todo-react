@@ -1,55 +1,40 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getProjects } from '../firebase/db.utils';
-import { useAuthContext } from './AuthContext';
+import useAuth from '../hooks/useAuth';
+import useDb from '../hooks/useDb';
+import { CommonProps, ProjectType, UserProjectsData } from '../types';
 
-interface Todo {
-  title: string;
-  description: string;
-  date: string;
-  priority: string;
-  completed: boolean;
-  id: string;
-}
-
-interface List {
-  name: string;
-  todos: Todo[];
-  id: string;
-  ownerId: string;
-}
-
-interface DataContextType {
-  data: List[];
-}
-
-const DataContext = createContext<DataContextType>({ data: [] });
+const DataContext = createContext<UserProjectsData>({
+  projects: [],
+  currentProjectId: null,
+});
 // Function for providing data to child components
 const useDataContext = () => useContext(DataContext);
 
-interface Props {
-  children?: React.ReactNode;
-}
-
-const DataProvider = ({ children }: Props) => {
-  const { user } = useAuthContext();
-  const [data, setData] = useState<List[]>([]);
+const DataProvider = ({ children }: CommonProps) => {
+  const { user } = useAuth();
+  const { getProjects } = useDb();
+  const [projectsData, setProjectsData] = useState<UserProjectsData>({
+    projects: [],
+    currentProjectId: null,
+  });
 
   // Retrieve data from firestore on mount
   useEffect(() => {
     const fetchProjects = async () => {
-      const result = await getProjects(user?.uid);
+      const projects = (await getProjects(user?.uid)) as ProjectType[];
 
-      setData(result);
+      setProjectsData({
+        projects,
+        currentProjectId: null,
+      });
     };
 
     fetchProjects();
   }, [user]);
 
-  const value = {
-    data,
-  };
-
-  return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
+  return (
+    <DataContext.Provider value={projectsData}>{children}</DataContext.Provider>
+  );
 };
 
 export { useDataContext, DataProvider };

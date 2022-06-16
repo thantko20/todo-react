@@ -46,6 +46,11 @@ const GlobalStyle = createGlobalStyle`
     color: inherit;
   }
 
+  li {
+    list-style: none;
+    list-style-type: none;
+  }
+
   a:visited {
     color: inherit;
   }

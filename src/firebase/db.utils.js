@@ -2,24 +2,6 @@ import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from './firebase';
 import uniqid from 'uniqid';
 
-const saveUser = async (userInfo) => {
-  try {
-    const usersRef = collection(db, 'users');
-
-    const q = query(usersRef, where('uid', '==', userInfo.uid));
-
-    const usersSnapshot = await getDocs(q);
-
-    if (usersSnapshot.empty) {
-      await addDoc(usersRef, userInfo);
-
-      return;
-    }
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 const getProjects = async (userId) => {
   const projectsRef = collection(db, 'projects');
   const q = query(projectsRef, where('ownerId', '==', userId));
@@ -50,4 +32,4 @@ const addProject = async (projectName, userId) => {
   }
 };
 
-export { saveUser, getProjects, addProject };
+export { getProjects, addProject };

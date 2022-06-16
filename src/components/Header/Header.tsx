@@ -15,12 +15,12 @@ interface Props {
 }
 
 const Header = ({ toggleSidebar }: Props) => {
-  const { user, handleSignOut } = useAuthContext();
+  const { user, signOut } = useAuthContext();
 
   return (
     <StyledHeader>
       <HeaderLeft>
-        <MeunButton>
+        <MeunButton onClick={toggleSidebar}>
           <GiHamburgerMenu size='1.2rem' />
         </MeunButton>
         <Logo>todo-list</Logo>
@@ -28,11 +28,8 @@ const Header = ({ toggleSidebar }: Props) => {
 
       {user && (
         <HeaderRight>
-          <AccountAvatar
-            displayName={user.displayName}
-            photoURL={user.photoURL}
-          />
-          <Button onClick={handleSignOut}>Logout</Button>
+          <AccountAvatar name={user.name} photoURL={user.photoURL} />
+          <Button onClick={signOut}>Logout</Button>
         </HeaderRight>
       )}
     </StyledHeader>

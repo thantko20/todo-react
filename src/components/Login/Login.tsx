@@ -3,7 +3,7 @@ import { Button, MainSection } from '../Generic';
 import { StyledLogin } from './Login.styled';
 
 const Login = () => {
-  const { handleSignIn, user } = useAuthContext();
+  const { signInWithGoogle, user } = useAuthContext();
 
   return (
     <MainSection>
@@ -14,7 +14,7 @@ const Login = () => {
             <p>Start using this app to organize your workflow and projects</p>
           </div>
 
-          <Button onClick={handleSignIn}>Login With Google</Button>
+          <Button onClick={signInWithGoogle}>Login With Google</Button>
         </StyledLogin>
       )}
     </MainSection>

@@ -2,14 +2,14 @@ import { SAccountAvatar } from './Header.styled';
 
 interface Props {
   photoURL: string | null;
-  displayName: string | null;
+  name: string | null;
 }
 
-const AccountAvatar = ({ photoURL, displayName }: Props) => {
+const AccountAvatar = ({ photoURL, name }: Props) => {
   return (
     <SAccountAvatar>
       <img src={photoURL! as string} alt='user avatar' />
-      <span>{displayName}</span>
+      <span>{name}</span>
     </SAccountAvatar>
   );
 };

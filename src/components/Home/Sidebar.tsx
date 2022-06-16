@@ -1,31 +1,32 @@
 import { useDataContext } from '../../providers/DataContext';
 import { useWindowWidth } from '../../hooks';
 import Button from '../Generic/Button';
+import { DefaultTab, StyledSidebarContent, TabsContainer } from './Home.styled';
 
 const SidebarContent = () => {
-  const { data } = useDataContext();
+  const { projects } = useDataContext();
 
   return (
-    <div className='relative z-20'>
-      <div>
-        <button>Inbox</button>
-        <button>Today</button>
-      </div>
+    <StyledSidebarContent>
+      <TabsContainer>
+        <DefaultTab isActive={true}>Inbox</DefaultTab>
+        <DefaultTab isActive={false}>Today</DefaultTab>
+      </TabsContainer>
 
-      {data && (
-        <ul>
-          {data.map((project) => {
+      {projects && (
+        <TabsContainer>
+          {projects.map((project) => {
             return <li key={project.id}>{project.name}</li>;
           })}
-        </ul>
+        </TabsContainer>
       )}
-      {!data && (
+      {!projects && (
         <div>
           <p>No Projects Created. Click this button to add one.</p>
           <Button onClick={() => {}}>Add Project</Button>
         </div>
       )}
-    </div>
+    </StyledSidebarContent>
   );
 };
 
